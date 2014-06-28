@@ -1,9 +1,7 @@
-#include "utils.ino"
-
 const int LOOP_DELAY = 500;
 // PIN
 // pin dei led
-int led1_pin, led2_pin, led_voice_pin;
+int led1_pin = 2, led2_pin = 3, led_voice_pin = 4;
 
 // STATUS
 // status dei led
@@ -49,7 +47,7 @@ void loop(){
 		// accendo il led verde
 		if(led1_status == HIGH && led2_status == HIGH){
 			// accendi il led verde
-			green_led_on(led_voice_pin);
+			digitalWrite(led_voice_pin, HIGH);
 			read_mic = true;			
 		}else{
 			digitalWrite(led_voice_pin, LOW);
