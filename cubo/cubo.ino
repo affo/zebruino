@@ -92,7 +92,7 @@ void loop(){
 		//analogWrite(led_voice_pin, rand_num);
 		rand_num = random(0, 10);
 		if(rand_num < 3){
-			digitalWrite(led_voice_pin, HIGH);
+			digitalWrite(led_voice_pin, LOW);
 			read_mic = false;
 
 			Serial.println("GREEN_LED: OFF (randomly)");
