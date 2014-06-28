@@ -75,8 +75,18 @@ void loop(){
 		// se tutti e due i led sono accesi
 		// accendo il led verde
 		if(led1_status == HIGH && led2_status == HIGH){
-			// accendi il led verde
-			fade(led_voice_pin, true, 1500);
+			//ok ci siamo, facciamo blinkare le rosse
+			for(int i = 0; i < 4; i++){
+				delay(250);
+				digitalWrite(led1_pin, LOW);
+				digitalWrite(led2_pin, LOW);
+				delay(250);
+				digitalWrite(led1_pin, HIGH);
+				digitalWrite(led2_pin, HIGH);
+			}
+			delay(500);
+			// accendi il led verde, (fade in)
+			fade(led_voice_pin, true, 2500);
 			read_mic = true;
 
 			Serial.println("GREEN_LED: ON (led1 on && led2 on)");			
@@ -88,20 +98,17 @@ void loop(){
 		}
 
 	}else{
-		//rand_num = int(random(0, 255));
-		//analogWrite(led_voice_pin, rand_num);
 		rand_num = random(0, 10);
 		if(rand_num < 3){
-			digitalWrite(led_voice_pin, LOW);
 			read_mic = false;
 
-			Serial.println("GREEN_LED: OFF (randomly)");
-		}else{
-			rand_num = random(0, 255);
-			Serial.print("TALKING: ");
-			Serial.println(rand_num);
-			analogWrite(led_voice_pin, rand_num);
+			Serial.println("GREEN_LED: REINIT (randomly)");
 		}
+
+		rand_num = random(0, 255);
+		Serial.print("TALKING: ");
+		Serial.println(rand_num);
+		analogWrite(led_voice_pin, rand_num);
 	}
 
 	delay(LOOP_DELAY);
