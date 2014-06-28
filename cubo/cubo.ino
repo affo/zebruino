@@ -20,15 +20,15 @@ void setup(){
 	pinMode(led2_pin, OUTPUT);
 	pinMode(led_voice_pin, OUTPUT);
 
-	randomSeed(analogRead(0));
+	randomSeed(analogRead(0))
 }
 
 void loop(){
 	if(!read_mic){
 
-		rand_num = random(0, 1);
+		rand_num = random(1, 10);
 		Serial.println(rand_num);
-		if(rand_num < 0.5){
+		if(rand_num < 5){
 			digitalWrite(led1_pin, HIGH);
 			led1_status = HIGH;
 
@@ -40,9 +40,9 @@ void loop(){
 			Serial.println("RED_LED_1: OFF");
 		}
 
-		rand_num = random(0, 1);
+		rand_num = random(1, 10);
 		Serial.println(rand_num);
-		if(rand_num < 0.5){
+		if(rand_num < 5){
 			digitalWrite(led2_pin, HIGH);
 			led2_status = HIGH;
 
@@ -72,9 +72,9 @@ void loop(){
 	}else{
 		//rand_num = int(random(0, 255));
 		//analogWrite(led_voice_pin, rand_num);
-		rand_num = random(0, 1);
+		rand_num = random(1, 10);
 		Serial.println(rand_num);
-		if(rand_num < 0.5){
+		if(rand_num < 5){
 			digitalWrite(led_voice_pin, HIGH);
 			read_mic = false;
 
