@@ -1,7 +1,7 @@
-const int LOOP_DELAY = 3000;
+const int LOOP_DELAY = 1000;
 // PIN
 // pin dei led
-int led1_pin = 2, led2_pin = 3, led_voice_pin = 4;
+int led1_pin = 2, led2_pin = 3, led_voice_pin = 5;
 
 // STATUS
 // status dei led
@@ -12,23 +12,25 @@ boolean read_mic = false;
 
 //simuliamo la presenza in modo randomico
 long rand_num = 0;
-// fade
-void fade(int pin, boolean in){
-	int start;
-	int end;
-	if(in){
-		start = 0;
-		end = 255;
-	}else{
-		start = 255;
-		end = 0;
-	}
 
-	for(; start <= end; start +=5){ 
-		analogWrite(pin, start);
-		// se non aspetti un po, l'accensione è istantanea (al tuo occhio)    
-		delay(30);
-	} 
+// fade
+void fade(int pin, boolean in, int duration){
+	int step = (5 * duration) / 255;
+	int min = 0;
+	int max = 255;
+	if(in){
+		for(; min <= max; min += 5){ 
+			analogWrite(pin, min);
+			// se non aspetti un po, l'accensione è istantanea (al tuo occhio)    
+			delay(step);
+		}
+	}else{
+		for(; max >= min; max -= 5){ 
+			analogWrite(pin, min);
+			// se non aspetti un po, l'accensione è istantanea (al tuo occhio)    
+			delay(step);
+		}
+	}
 }
 
 
@@ -46,8 +48,7 @@ void loop(){
 
 		rand_num = random(0, 10);
 		if(rand_num < 5){
-			//digitalWrite(led1_pin, HIGH);
-			fade(led1_pin, true);
+			digitalWrite(led1_pin, HIGH);
 			led1_status = HIGH;
 
 			Serial.println("RED_LED_1: ON");
@@ -75,7 +76,7 @@ void loop(){
 		// accendo il led verde
 		if(led1_status == HIGH && led2_status == HIGH){
 			// accendi il led verde
-			digitalWrite(led_voice_pin, HIGH);
+			fade(led_voice_pin, true, 1500);
 			read_mic = true;
 
 			Serial.println("GREEN_LED: ON (led1 on && led2 on)");			
@@ -90,11 +91,16 @@ void loop(){
 		//rand_num = int(random(0, 255));
 		//analogWrite(led_voice_pin, rand_num);
 		rand_num = random(0, 10);
-		if(rand_num < 5){
+		if(rand_num < 3){
 			digitalWrite(led_voice_pin, HIGH);
 			read_mic = false;
 
 			Serial.println("GREEN_LED: OFF (randomly)");
+		}else{
+			rand_num = random(0, 255);
+			Serial.print("TALKING: ");
+			Serial.println(rand_num);
+			analogWrite(led_voice_pin, rand_num);
 		}
 	}
 
