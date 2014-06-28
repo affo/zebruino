@@ -12,6 +12,24 @@ boolean read_mic = false;
 
 //simuliamo la presenza in modo randomico
 long rand_num = 0;
+// fade
+void fade(int pin, boolean in){
+	int start;
+	int end;
+	if(in){
+		start = 0;
+		end = 255;
+	}else{
+		start = 255;
+		end = 0;
+	}
+
+	for(; start <= end; start +=5){ 
+		analogWrite(pin, start);
+		// se non aspetti un po, l'accensione è istantanea (al tuo occhio)    
+		delay(30);
+	} 
+}
 
 
 void setup(){
@@ -28,7 +46,8 @@ void loop(){
 
 		rand_num = random(0, 10);
 		if(rand_num < 5){
-			digitalWrite(led1_pin, HIGH);
+			//digitalWrite(led1_pin, HIGH);
+			fade(led1_pin, true);
 			led1_status = HIGH;
 
 			Serial.println("RED_LED_1: ON");
