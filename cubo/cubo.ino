@@ -1,7 +1,9 @@
 const int LOOP_DELAY = 1000;
 // PIN
 // pin dei led
-int led1_pin = 2, led2_pin = 3, led_voice_pin = 5;
+int led1_pin = 2, led2_pin = 3;
+// sui pin contrassegnati da ~ si può scrivere anche analog
+int led_voice_pin = 5;
 
 // STATUS
 // status dei led
@@ -76,6 +78,7 @@ void loop(){
 		// accendo il led verde
 		if(led1_status == HIGH && led2_status == HIGH){
 			//ok ci siamo, facciamo blinkare le rosse
+			delay(750);
 			for(int i = 0; i < 4; i++){
 				delay(250);
 				digitalWrite(led1_pin, LOW);
@@ -99,9 +102,9 @@ void loop(){
 
 	}else{
 		rand_num = random(0, 10);
-		if(rand_num < 3){
+		if(rand_num < 2){
+			// si allontanano in modo randomico
 			read_mic = false;
-
 			Serial.println("GREEN_LED: REINIT (randomly)");
 		}
 
