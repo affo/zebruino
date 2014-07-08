@@ -1,6 +1,4 @@
 #define LOOP_DELAY 10
-#define ENABLE_1 12
-#define ENABLE_2 13
 
 // PIN
 // pin dei sensori di prossimità
@@ -42,13 +40,6 @@ void setup(){
 	pinMode(pin_led, OUTPUT);
 	pinMode(pin_mic, INPUT);
 
-	pinMode(ENABLE_1, OUTPUT);
-	pinMode(ENABLE_2, OUTPUT);
-	
-	// spegni i led già presenti sui sensori di prossimità
-	digitalWrite(ENABLE_1, LOW);
-	digitalWrite(ENABLE_2, LOW);
-
 	//prendi il primo valore di rumore
 	noise = analogRead(pin_mic); 
 }
@@ -63,7 +54,6 @@ void loop(){
 	// lo settiamo a sempre attivo:
 	status_prox_2 = LOW;
 
-
 	if(status_prox_1 == HIGH || status_prox_2 == HIGH){
 		// se uno dei sensori non è attivo
 		//allora vado avanti a "registrare" il rumore di fondo:
@@ -71,7 +61,7 @@ void loop(){
 		// spengo il led centrale
 		digitalWrite(pin_led, LOW);
 		// prendo il rumore
-		noise = digitalRead(pin_mic);
+		noise = analogRead(pin_mic);
 	}else{
 
 		// altrimenti
@@ -87,10 +77,9 @@ void loop(){
 		// per non fondere il led, normalizzo il valore ottenuto tramite proporzione:
 		//		x : 255 = uscita_microfono : 1023
 		// quindi
-		// 		x = (255 / 1023) * uscita_microfono
+		// 		x = (256 / 1024) * uscita_microfono
 
-		int status_led = (int) (255 / 1023) * mic_status;
-
+		int status_led = (int) ((255 / (float)1023) * mic_status);
 		// infine scrivo il valore ottenuto sul led  
 		analogWrite(pin_led, status_led);
 	}
