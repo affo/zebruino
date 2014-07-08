@@ -1,4 +1,4 @@
-const int LOOP_DELAY = 100;
+const int LOOP_DELAY = 5;
 
 //PIN
 int pin_prox_out_1 = 9;
@@ -38,8 +38,8 @@ void loop(){
 	//digitalWrite(pin_prox_enable_1, LOW);
 	//digitalWrite(pin_prox_enable_2, LOW);
 
-	//status = analogRead(pin_prox_out_1);
-	//print_test("PROXIMITY_1", status);
+	int status_prox = digitalRead(pin_prox_out_1);
+	if(status_prox) print_test("PROXIMITY_1", status_prox);
 
 	//status = analogRead(pin_prox_out_2);
 	//print_test("PROXIMITY_2", status);

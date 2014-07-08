@@ -1,19 +1,18 @@
-const int LOOP_DELAY = 1000;
+#define LOOP_DELAY 10
+#define ENABLE_1 12
+#define ENABLE_2 13
+
 // PIN
+// pin dei sensori di prossimità
+int pin_prox_1 = 2;
+int pin_prox_2 = 3;
 // pin dei led
-int led1_pin = 2, led2_pin = 3;
-// sui pin contrassegnati da ~ si può scrivere anche analog
-int led_voice_pin = 5;
+int pin_led = 9;
+// pin del microfono
+int pin_mic = A0;
 
-// STATUS
-// status dei led
-int led1_status, led2_status, led_voice_status;
-
-// booleano (T/F) per capire lo stato
-boolean read_mic = false;
-
-//simuliamo la presenza in modo randomico
-long rand_num = 0;
+//rumore di fondo
+int noise;
 
 // fade
 void fade(int pin, boolean in, int duration){
@@ -38,80 +37,62 @@ void fade(int pin, boolean in, int duration){
 
 void setup(){
 	Serial.begin(9600);
-	pinMode(led1_pin, OUTPUT);
-	pinMode(led2_pin, OUTPUT);
-	pinMode(led_voice_pin, OUTPUT);
+	pinMode(pin_prox_1, INPUT);
+	pinMode(pin_prox_2, INPUT);
+	pinMode(pin_led, OUTPUT);
+	pinMode(pin_mic, INPUT);
 
-	randomSeed(analogRead(0));
+	pinMode(ENABLE_1, OUTPUT);
+	pinMode(ENABLE_2, OUTPUT);
+	
+	// spegni i led già presenti sui sensori di prossimità
+	digitalWrite(ENABLE_1, LOW);
+	digitalWrite(ENABLE_2, LOW);
+
+	//prendi il primo valore di rumore
+	noise = analogRead(pin_mic); 
 }
 
 void loop(){
-	if(!read_mic){
+	// prendo i valori dai sensori di presenza
+	int status_prox_1 = digitalRead(pin_prox_1);
+	int status_prox_2 = digitalRead(pin_prox_2);
 
-		rand_num = random(0, 10);
-		if(rand_num < 5){
-			digitalWrite(led1_pin, HIGH);
-			led1_status = HIGH;
+	// TODO rimuovere!
+	// per ora, non abbiamo il secondo sensore di prossimità.
+	// lo settiamo a sempre attivo:
+	status_prox_2 = LOW;
 
-			Serial.println("RED_LED_1: ON");
-		}else{
-			digitalWrite(led1_pin, LOW);
-			led1_status = LOW;
 
-			Serial.println("RED_LED_1: OFF");
-		}
+	if(status_prox_1 == HIGH || status_prox_2 == HIGH){
+		// se uno dei sensori non è attivo
+		//allora vado avanti a "registrare" il rumore di fondo:
 
-		rand_num = random(0, 10);
-		if(rand_num < 5){
-			digitalWrite(led2_pin, HIGH);
-			led2_status = HIGH;
-
-			Serial.println("RED_LED_2: ON");
-		}else{
-			digitalWrite(led2_pin, LOW);
-			led2_status = LOW;
-
-			Serial.println("RED_LED_2: OFF");
-		}
-
-		// se tutti e due i led sono accesi
-		// accendo il led verde
-		if(led1_status == HIGH && led2_status == HIGH){
-			//ok ci siamo, facciamo blinkare le rosse
-			delay(750);
-			for(int i = 0; i < 4; i++){
-				delay(250);
-				digitalWrite(led1_pin, LOW);
-				digitalWrite(led2_pin, LOW);
-				delay(250);
-				digitalWrite(led1_pin, HIGH);
-				digitalWrite(led2_pin, HIGH);
-			}
-			delay(500);
-			// accendi il led verde, (fade in)
-			fade(led_voice_pin, true, 2500);
-			read_mic = true;
-
-			Serial.println("GREEN_LED: ON (led1 on && led2 on)");			
-		}else{
-			digitalWrite(led_voice_pin, LOW);
-			read_mic = false;
-
-			Serial.println("GREEN_LED: OFF (led1 off || led2 off)");
-		}
-
+		// spengo il led centrale
+		digitalWrite(pin_led, LOW);
+		// prendo il rumore
+		noise = digitalRead(pin_mic);
 	}else{
-		rand_num = random(0, 10);
-		if(rand_num < 2){
-			// si allontanano in modo randomico
-			read_mic = false;
-			Serial.println("GREEN_LED: REINIT (randomly)");
-		}
 
-		rand_num = random(0, 255);
-		Serial.print("TALKING: ");
-		Serial.println(rand_num);
-		analogWrite(led_voice_pin, rand_num);
+		// altrimenti
+		// accendo il led in base a ciò che leggo dal microfono
+		int mic_status = analogRead(pin_mic);
+
+		// tolgo il brusio limitando a 0
+		mic_status -= noise;
+		if(mic_status < 0) mic_status = 0;
+
+		// il microfono è a 10 bit (da 0 a 1023);
+		// il led è a 8 bit (da 0 a 255);
+		// per non fondere il led, normalizzo il valore ottenuto tramite proporzione:
+		//		x : 255 = uscita_microfono : 1023
+		// quindi
+		// 		x = (255 / 1023) * uscita_microfono
+
+		int status_led = (int) (255 / 1023) * mic_status;
+
+		// infine scrivo il valore ottenuto sul led  
+		analogWrite(pin_led, status_led);
 	}
 
 	delay(LOOP_DELAY);
