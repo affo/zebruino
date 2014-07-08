@@ -9,8 +9,24 @@ int pin_led = 9;
 // pin del microfono
 int pin_mic = A0;
 
-//rumore di fondo
+// rumore di fondo
 int noise;
+
+// last value in led
+int last_range;
+
+//returns the range of the signal
+int range(int led_analog){
+	led_analog++;
+	if(led_analog <= 32) return 0;
+	if(led_analog <= 64) return 1;
+	if(led_analog <= 96) return 2;
+	if(led_analog <= 128) return 3;
+	if(led_analog <= 160) return 4;
+	if(led_analog <= 192) return 5;
+	if(led_analog <= 224) return 6;
+	if(led_analog <= 256) return 7;
+}
 
 // fade
 void fade(int pin, boolean in, int duration){
@@ -41,7 +57,8 @@ void setup(){
 	pinMode(pin_mic, INPUT);
 
 	//prendi il primo valore di rumore
-	noise = analogRead(pin_mic); 
+	noise = analogRead(pin_mic);
+	last_range = 0;
 }
 
 void loop(){
@@ -81,16 +98,23 @@ void loop(){
 
 		int status_led = (int) ((255 / (float)1023) * status_mic);
 
-		//TODO remove
-		Serial.print("(NOISE, MIC, LED) --->  ");
-		Serial.print(noise);
-		Serial.print(",\t");
-		Serial.print(status_mic);
-		Serial.print(",\t");
-		Serial.println(status_led);
+		int curr_range = range(status_led);
 
-		// infine scrivo il valore ottenuto sul led  
-		analogWrite(pin_led, status_led);
+		if(curr_range != last_range){
+			//TODO remove
+			Serial.print("(NOISE, MIC, LED) --->  ");
+			Serial.print(noise);
+			Serial.print(",\t");
+			Serial.print(status_mic);
+			Serial.print(",\t");
+			Serial.println(status_led);
+
+			last_range = curr_range;
+
+			// infine scrivo il valore ottenuto sul led
+			int write = (curr_range)  
+			analogWrite(pin_led, (curr_range + 1)*32 - 16);
+		}
 	}
 
 	delay(LOOP_DELAY);
