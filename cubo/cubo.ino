@@ -1,58 +1,77 @@
-const int LOOP_DELAY = 500;
+#define LOOP_DELAY 10
+#define ENABLE_1 12
+#define ENABLE_2 13
+
 // PIN
 // pin dei sensori di prossimità
-int presence1_pin, presence2_pin;
+int pin_prox_1 = 2;
+int pin_prox_2 = 3;
 // pin dei led
-int led1_pin, led2_pin, led_voice_pin;
+int pin_led = 9;
 // pin del microfono
-int mic_pin;
+int pin_mic = A0;
 
-// STATUS
-int presence1_status, presence2_status;
-// status del microfono
-int mic_status;
+//rumore di fondo
+int noise;
 
 
 void setup(){
 	Serial.begin(9600);
-	pinMode(presence1_pin, INPUT);
-	pinMode(presence2_pin, INPUT);
+	pinMode(pin_prox_1, INPUT);
+	pinMode(pin_prox_2, INPUT);
+	pinMode(pin_led, OUTPUT);
+	pinMode(pin_mic, INPUT);
 
-	pinMode(led1_pin, OUTPUT);
-	pinMode(led2_pin, OUTPUT);
-	pinMode(led_voice_pin, OUTPUT);
+	pinMode(ENABLE_1, OUTPUT);
+	pinMode(ENABLE_2, OUTPUT);
+	// spegni i led già presenti sui sensori di prossimità
+	digitalWrite(ENABLE_1, LOW);
+	digitalWrite(ENABLE_2, LOW);
 
-	pinMode(mic_pin, INPUT);
+	//prendi il primo valore di rumore
+	noise = digitalRead(pin_mic); 
 }
 
 void loop(){
-	// prendo i valori dai sensori di presenza..
-	presence1_status = digitalRead(presence1_pin);
-	presence2_status = digitalRead(presence2_pin);
+	// prendo i valori dai sensori di presenza
+	int status_prox_1 = digitalRead(pin_prox_1);
+	int status_prox_2 = digitalRead(pin_prox_2);
 
-	// se qualcuno è vicino accendo il led1 rosso
-	// se non trovo nessuno, spengo
-	if(presence1_status == HIGH){
-		digitalWrite(led1_pin, HIGH);
-	}else{
-		digitalWrite(led1_pin, LOW);
-	}
+	// TODO rimuovere!
+	// per ora, non abbiamo il secondo sensore di prossimità.
+	// lo settiamo a sempre attivo:
+	status_prox_2 = LOW;
 
-	// se qualcuno è vicino accendo il led2 rosso
-	// se non trovo nessuno, spengo
-	if(presence2_status == HIGH){
-		digitalWrite(led2_pin, HIGH);
-	}else{
-		digitalWrite(led2_pin, LOW);
-	}
 
-	// se tutti e due i led sono accesi
-	// accendo il led verde in base a ciò che leggo dal microfono
-	if(led1_status == HIGH && led2_status == HIGH){
-		mic_status = analogRead(mic_pin);
-		analogWrite(led_voice_pin, mic_status);
+	if(status_prox_1 == HIGH || status_prox_2 == HIGH){
+		// se uno dei sensori non è attivo
+		//allora vado avanti a "registrare" il rumore di fondo:
+
+		// spengo il led centrale
+		digitalWrite(pin_led, LOW);
+		// prendo il rumore
+		noise = digitalRead(pin_mic);
 	}else{
-		digitalWrite(led_voice_pin, LOW);
+
+		// altrimenti
+		// accendo il led in base a ciò che leggo dal microfono
+		int mic_status = analogRead(pin_mic);
+
+		// tolgo il brusio limitando a 0
+		mic_status -= noise;
+		if(mic_status < 0) mic_status = 0;
+
+		// il microfono è a 10 bit (da 0 a 1023);
+		// il led è a 8 bit (da 0 a 255);
+		// per non fondere il led, normalizzo il valore ottenuto tramite proporzione:
+		//		x : 255 = uscita_microfono : 1023
+		// quindi
+		// 		x = (255 / 1023) * uscita_microfono
+
+		int status_led = (int) (255 / 1023) * mic_status;
+
+		// infine scrivo il valore ottenuto sul led  
+		analogWrite(pin_led, status_led);
 	}
 
 	delay(LOOP_DELAY);
