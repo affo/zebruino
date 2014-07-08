@@ -56,7 +56,7 @@ void loop(){
 
 	if(status_prox_1 == HIGH || status_prox_2 == HIGH){
 		// se uno dei sensori non è attivo
-		//allora vado avanti a "registrare" il rumore di fondo:
+		// allora vado avanti a "registrare" il rumore di fondo:
 
 		// spengo il led centrale
 		digitalWrite(pin_led, LOW);
@@ -66,20 +66,29 @@ void loop(){
 
 		// altrimenti
 		// accendo il led in base a ciò che leggo dal microfono
-		int mic_status = analogRead(pin_mic);
+		int status_mic = analogRead(pin_mic);
 
 		// tolgo il brusio limitando a 0
-		mic_status -= noise;
-		if(mic_status < 0) mic_status = 0;
+		status_mic -= noise;
+		if(status_mic < 0) status_mic = 0;
 
 		// il microfono è a 10 bit (da 0 a 1023);
 		// il led è a 8 bit (da 0 a 255);
 		// per non fondere il led, normalizzo il valore ottenuto tramite proporzione:
 		//		x : 255 = uscita_microfono : 1023
 		// quindi
-		// 		x = (256 / 1024) * uscita_microfono
+		// 		x = (255 / 1023) * uscita_microfono
 
-		int status_led = (int) ((255 / (float)1023) * mic_status);
+		int status_led = (int) ((255 / (float)1023) * status_mic);
+
+		//TODO remove
+		Serial.print("(NOISE, MIC, LED) --->  ");
+		Serial.print(noise);
+		Serial.print(",\t");
+		Serial.print(status_mic);
+		Serial.print(",\t");
+		Serial.println(status_led);
+
 		// infine scrivo il valore ottenuto sul led  
 		analogWrite(pin_led, status_led);
 	}
