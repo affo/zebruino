@@ -9,8 +9,14 @@ int pin_led = 9;
 // pin del microfono
 int pin_mic = A0;
 
-//rumore di fondo
-int noise;
+//MIC vars
+int mic_min = 1024; //set it to HIGHest
+int mic_max = 0; //set it to LOWest
+
+void reset_mic_vars(void){
+	mic_min = 1024;
+	mic_max = 0;
+}
 
 // fade
 void fade(int pin, boolean in, int duration){
@@ -39,9 +45,6 @@ void setup(){
 	pinMode(pin_prox_2, INPUT);
 	pinMode(pin_led, OUTPUT);
 	pinMode(pin_mic, INPUT);
-
-	//prendi il primo valore di rumore
-	noise = analogRead(pin_mic); 
 }
 
 void loop(){
@@ -56,41 +59,43 @@ void loop(){
 
 	if(status_prox_1 == HIGH || status_prox_2 == HIGH){
 		// se uno dei sensori non è attivo
-		// allora vado avanti a "registrare" il rumore di fondo:
-
 		// spengo il led centrale
 		digitalWrite(pin_led, LOW);
-		// prendo il rumore
-		noise = analogRead(pin_mic);
 	}else{
 
 		// altrimenti
 		// accendo il led in base a ciò che leggo dal microfono
 		int status_mic = analogRead(pin_mic);
 
-		// tolgo il brusio limitando a 0
-		status_mic -= noise;
-		if(status_mic < 0) status_mic = 0;
+		if(status_mic > mic_max){
+			mic_max = status_mic;
+		}
 
-		// il microfono è a 10 bit (da 0 a 1023);
-		// il led è a 8 bit (da 0 a 255);
-		// per non fondere il led, normalizzo il valore ottenuto tramite proporzione:
-		//		x : 255 = uscita_microfono : 1023
-		// quindi
-		// 		x = (255 / 1023) * uscita_microfono
+		if(status_mic < mic_min){
+			mic_min = status_mic;
+		}
 
-		int status_led = (int) ((255 / (float)1023) * status_mic);
+		int volume = mic_max - mic_min;
+		if(volume > 0){
+			// il microfono è a 10 bit (da 0 a 1023);
+			// il led è a 8 bit (da 0 a 255);
+			// per non fondere il led, normalizzo il valore ottenuto tramite proporzione:
+			//		x : 255 = uscita_microfono : 1023
+			// quindi
+			// 		x = (255 / 1023) * uscita_microfono
+			int status_led = (int) ((255 / (float)1023) * volume);
 
-		//TODO remove
-		Serial.print("(NOISE, MIC, LED) --->  ");
-		Serial.print(noise);
-		Serial.print(",\t");
-		Serial.print(status_mic);
-		Serial.print(",\t");
-		Serial.println(status_led);
+			//TODO remove
+			Serial.print("(NOISE, MIC, LED) --->  ");
+			Serial.print(noise);
+			Serial.print(",\t");
+			Serial.print(volume);
+			Serial.print(",\t");
+			Serial.println(status_led);
 
-		// infine scrivo il valore ottenuto sul led  
-		analogWrite(pin_led, status_led);
+			// infine scrivo il valore ottenuto sul led  
+			analogWrite(pin_led, status_led);
+		}
 	}
 
 	delay(LOOP_DELAY);
