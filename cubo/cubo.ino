@@ -1,6 +1,11 @@
 #define LOOP_DELAY 10
-#define MEASUREMENT_SPAN 20
+#define PROX_MEASUREMENT_SPAN 20
+#define MIC_MEASUREMENT_SPAN 10
 #define FADE_DURATION 2000
+#define MIC_THRESHOLD 20
+
+#define NO_LEDS_MIC 4
+#define NO_RANGES 8
 
 // PIN
 // pin dei sensori di prossimità
@@ -10,7 +15,7 @@ int pin_prox_2 = 3;
 int pin_led_1 = 10; // semi-analog
 int pin_led_2 = 11; // semi-analog
 int pin_led_4ever = 6; // semi-analog
-int pin_led_mic = 5; // semi-analog
+int pin_leds_mic[NO_LEDS_MIC] = {A1, A2, A3, A4}; // analog
 // pin del microfono
 int pin_mic = A0;
 
@@ -18,19 +23,20 @@ int pin_mic = A0;
 int noise;
 
 // togliere il flickering dai sensori di prossimità
-int last_prox_1[MEASUREMENT_SPAN], index_1 = 0;
-int last_prox_2[MEASUREMENT_SPAN], index_2 = 0;
-int mic_values[MEASUREMENT_SPAN], index_mic = 0;
+int last_prox_1[PROX_MEASUREMENT_SPAN], index_1 = 0;
+int last_prox_2[PROX_MEASUREMENT_SPAN], index_2 = 0;
+int mic_values[MIC_MEASUREMENT_SPAN], index_mic = 0;
 
-// status dei led di prossimità
+// status dei led
 boolean led_1_on = false;
 boolean led_2_on = false;
 boolean led_4ever_on = false;
+boolean leds_mic_on[NO_LEDS_MIC] = {false, false, false, false}; 
 
 void add_prox_1(int val){
 	last_prox_1[index_1] = val;
 	index_1++;
-	if(index_1 == MEASUREMENT_SPAN){
+	if(index_1 == PROX_MEASUREMENT_SPAN){
 		index_1 = 0;
 	}
 } 
@@ -38,7 +44,7 @@ void add_prox_1(int val){
 void add_prox_2(int val){
 	last_prox_2[index_2] = val;
 	index_2++;
-	if(index_2 == MEASUREMENT_SPAN){
+	if(index_2 == PROX_MEASUREMENT_SPAN){
 		index_2 = 0;
 	}
 }
@@ -46,14 +52,14 @@ void add_prox_2(int val){
 void add_mic(int val){
 	mic_values[index_2] = val;
 	index_mic++;
-	if(index_mic == MEASUREMENT_SPAN){
+	if(index_mic == MIC_MEASUREMENT_SPAN){
 		index_mic = 0;
 	}
 }
 
 int get_prox_1(void){
 	int result = HIGH;
-	for(int i = 0; i < MEASUREMENT_SPAN; i++){
+	for(int i = 0; i < PROX_MEASUREMENT_SPAN; i++){
 		result = result && !last_prox_1[i];
 		if(!result){
 			break;
@@ -64,7 +70,7 @@ int get_prox_1(void){
 
 int get_prox_2(void){
 	int result = HIGH;
-	for(int i = 0; i < MEASUREMENT_SPAN; i++){
+	for(int i = 0; i < PROX_MEASUREMENT_SPAN; i++){
 		result = result && !last_prox_2[i];
 		if(!result){
 			break;
@@ -75,22 +81,44 @@ int get_prox_2(void){
 
 int get_mic_val(void){
 	int result = 0;
-	for(int i = 0; i < MEASUREMENT_SPAN; i++){
+	for(int i = 0; i < MIC_MEASUREMENT_SPAN; i++){
 		result += mic_values[i];
 	}
-	return (int) (result / (float)MEASUREMENT_SPAN);
+	return (int) (result / (float)PROX_MEASUREMENT_SPAN);
 }
 
 // funzione creata per non permettere che il led vada in "flickering"
-// ritorna 4 valori predefiniti al posto dei 256 possibili.
+// ritorna un range di appartenenza.
 // i valori sono equamente distribuiti.
-int rangify(int led_analog){
-	led_analog++;
-	if(led_analog <= 10) return 0;
-	if(led_analog <= 64) return 32;
-	if(led_analog <= 128) return 96;
-	if(led_analog <= 192) return 160;
-	if(led_analog <= 256) return 224;
+int rangify(int val){
+	//soglia minima per accendersi
+	if(val < MIC_THRESHOLD) return 0;
+
+	int step = 256 / NO_RANGES;
+	for(int i = 1; i <= NO_RANGES; i++){
+		if(val <= step * i) return i;
+	}
+}
+
+// funzione che scrive il valore del microfono
+// sui 4 led. Più sarà alto il valore letto,
+// più led si accenderanno
+void write_led(int range){
+	// accendo quelli che servono
+	for(int i = 0; i < range; i++){
+		if(!leds_mic_on[i]){
+			fade(pin_leds_mic[i], true, 500);
+			leds_mic_on[i] = true;
+		}
+	}
+
+	//spengo gli altri
+	for(int i = range; i < NO_LEDS_MIC; i++){
+		if(leds_mic_on[i]){
+			fade(pin_leds_mic[i], false, 500);
+			leds_mic_on[i] = false;
+		}
+	}
 }
 
 // fade
@@ -126,7 +154,7 @@ void setup(){
 
 	noise = analogRead(pin_mic);
 
-	for(int i = 0; i < MEASUREMENT_SPAN; i++){
+	for(int i = 0; i < PROX_MEASUREMENT_SPAN; i++){
 		last_prox_1[i] = HIGH;
 		last_prox_2[i] = HIGH;
 		mic_values[i] = 0;
@@ -209,7 +237,7 @@ void loop(){
 
 		// "rangifizzo" il valore del led per evitare il "flickeraggio".
 		// infine scrivo il valore ottenuto sul led
-		analogWrite(pin_led_mic, rangify(status_led));
+		write_led(rangify(status_led));
 
 	}else{
 		// se uno dei sensori non è attivo
