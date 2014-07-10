@@ -14,6 +14,9 @@ int pin_mic = A0;
 // rumore di fondo
 int noise;
 
+int last_prox_1;
+int last_prox_2; 
+
 // funzione creata per non permettere che il led vada in "flickering"
 // ritorna 4 valori predefiniti al posto dei 256 possibili.
 // i valori sono equamente distribuiti.
@@ -56,6 +59,8 @@ void setup(){
 	pinMode(pin_mic, INPUT);
 
 	noise = analogRead(pin_mic);
+	last_prox_1 = HIGH;
+	last_prox_2 = HIGH;
 }
 
 void loop(){
@@ -64,15 +69,19 @@ void loop(){
 	int status_prox_2 = digitalRead(pin_prox_2);
 
 	// accendo i led in base ai sensori di prossimità
-	if(status_prox_1 == HIGH){
+	if(status_prox_1 == HIGH && last_prox_1 == HIGH){
+		last_prox_1 = HIGH;
 		digitalWrite(pin_led_1, LOW);
-	}else{
+	}else if(status_prox_1 == LOW && last_prox_1 == LOW){
+		last_prox_1 = LOW;
 		digitalWrite(pin_led_1, HIGH);
 	}
 
-	if(status_prox_2 == HIGH){
+	if(status_prox_2 == HIGH && last_prox_2 == HIGH){
+		last_prox_2 = HIGH;
 		digitalWrite(pin_led_2, LOW);
-	}else{
+	}else if(status_prox_2 == LOW && last_prox_2 == LOW){
+		last_prox_2 = LOW;
 		digitalWrite(pin_led_2, HIGH);
 	}
 
