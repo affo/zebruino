@@ -1,5 +1,6 @@
 #define LOOP_DELAY 10
 #define MEASUREMENT_SPAN 20
+#define FADE_DURATION 2000
 
 // PIN
 // pin dei sensori di prossimità
@@ -8,7 +9,8 @@ int pin_prox_2 = 3;
 // pin dei led
 int pin_led_1 = 10; // semi-analog
 int pin_led_2 = 11; // semi-analog
-int pin_led = 9; // semi-analog
+int pin_led_4ever = 6; // semi-analog
+int pin_led_mic = 5; // semi-analog
 // pin del microfono
 int pin_mic = A0;
 
@@ -22,6 +24,7 @@ int last_prox_2[MEASUREMENT_SPAN], index_2 = 0;
 // status dei led di prossimità
 boolean led_1_on = false;
 boolean led_2_on = false;
+boolean led_4ever_on = false;
 
 void add_prox_1(int val){
 	last_prox_1[index_1] = val;
@@ -97,7 +100,8 @@ void setup(){
 	Serial.begin(9600);
 	pinMode(pin_prox_1, INPUT);
 	pinMode(pin_prox_2, INPUT);
-	pinMode(pin_led, OUTPUT);
+	pinMode(pin_led_4ever, OUTPUT);
+	pinMode(pin_led_mic, OUTPUT);
 	pinMode(pin_led_1, OUTPUT);
 	pinMode(pin_led_2, OUTPUT);
 	pinMode(pin_mic, INPUT);
@@ -124,13 +128,13 @@ void loop(){
 	if(status_prox_1){
 		// accendo solo se è spento
 		if(!led_1_on){
-			fade(pin_led_1, true, 2000);
+			fade(pin_led_1, true, FADE_DURATION);
 			led_1_on = true;
 		}
 	}else{
 		// spengo solo se è acceso
 		if(led_1_on){
-			fade(pin_led_1, false, 2000);
+			fade(pin_led_1, false, FADE_DURATION);
 			led_1_on = false;
 		}
 	}
@@ -139,20 +143,25 @@ void loop(){
 	if(status_prox_2){
 		// accendo solo se è spento
 		if(!led_2_on){
-			fade(pin_led_2, true, 2000);
+			fade(pin_led_2, true, FADE_DURATION);
 			led_2_on = true;
 		}
 	}else{
 		// spengo solo se è acceso
 		if(led_2_on){
-			fade(pin_led_2, false, 2000);
+			fade(pin_led_2, false, FADE_DURATION);
 			led_2_on = false;
 		}
 	}
 
 	if(status_prox_1 && status_prox_2){
-		// altrimenti
-		// accendo il led in base a ciò che leggo dal microfono
+		// accendo il led che rimane sempre acceso
+		if(!led_4ever_on){
+			fade(pin_led_4ever, true, FADE_DURATION);
+			led_4ever_on = true;
+		}
+
+		// leggo dal mic
 		int status_mic = analogRead(pin_mic);
 
 		// tolgo il brusio limitando a 0
@@ -178,14 +187,18 @@ void loop(){
 
 		// "rangifizzo" il valore del led per evitare il "flickeraggio".
 		// infine scrivo il valore ottenuto sul led
-		analogWrite(pin_led, rangify(status_led));
+		analogWrite(pin_led_mic, rangify(status_led));
 
 	}else{
 		// se uno dei sensori non è attivo
 		// allora vado avanti a "registrare" il rumore di fondo:
 
-		// spengo il led centrale
-		digitalWrite(pin_led, LOW);
+		// accendo il led che rimane sempre acceso
+		if(led_4ever_on){
+			fade(pin_led_4ever, false, FADE_DURATION);
+			led_4ever_on = false;
+		}
+
 		// prendo il rumore
 		noise = analogRead(pin_mic);
 	}
