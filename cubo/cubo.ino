@@ -70,20 +70,18 @@ void loop(){
 
 	// accendo i led in base ai sensori di prossimità
 	if(status_prox_1 == HIGH && last_prox_1 == HIGH){
-		last_prox_1 = HIGH;
 		digitalWrite(pin_led_1, LOW);
 	}else if(status_prox_1 == LOW && last_prox_1 == LOW){
-		last_prox_1 = LOW;
 		digitalWrite(pin_led_1, HIGH);
 	}
+	last_prox_1 = status_prox_1;
 
 	if(status_prox_2 == HIGH && last_prox_2 == HIGH){
-		last_prox_2 = HIGH;
 		digitalWrite(pin_led_2, LOW);
 	}else if(status_prox_2 == LOW && last_prox_2 == LOW){
-		last_prox_2 = LOW;
 		digitalWrite(pin_led_2, HIGH);
 	}
+	last_prox_2 = status_prox_2
 
 	if(status_prox_1 == HIGH || status_prox_2 == HIGH){
 		// se uno dei sensori non è attivo
