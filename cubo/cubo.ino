@@ -4,18 +4,18 @@
 #define FADE_DURATION 2000
 #define MIC_THRESHOLD 20
 
-#define NO_LEDS_MIC 4
+#define NO_LEDS_MIC 3
 #define NO_RANGES 8
 
 // PIN
 // pin dei sensori di prossimità
-int pin_prox_1 = 2;
-int pin_prox_2 = 3;
+int pin_prox_1 = 0
+int pin_prox_2 = 1;
 // pin dei led
 int pin_led_1 = 10; // semi-analog
 int pin_led_2 = 11; // semi-analog
 int pin_led_4ever = 6; // semi-analog
-int pin_leds_mic[NO_LEDS_MIC] = {A1, A2, A3, A4}; // analog
+int pin_leds_mic[NO_LEDS_MIC] = {3, 5, 9}; // semi-analog
 // pin del microfono
 int pin_mic = A0;
 
@@ -50,7 +50,7 @@ void add_prox_2(int val){
 }
 
 void add_mic(int val){
-	mic_values[index_2] = val;
+	mic_values[index_mic] = val;
 	index_mic++;
 	if(index_mic == MIC_MEASUREMENT_SPAN){
 		index_mic = 0;
@@ -98,6 +98,8 @@ int rangify(int val){
 	for(int i = 1; i <= NO_RANGES; i++){
 		if(val <= step * i) return i;
 	}
+
+	return i;
 }
 
 // funzione che scrive il valore del microfono
