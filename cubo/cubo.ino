@@ -3,6 +3,7 @@
 #define MIC_MEASUREMENT_SPAN 10
 #define FADE_DURATION 2000
 #define MIC_THRESHOLD 20
+#define TALKING_THRESHOLD 250
 
 #define NO_LEDS_MIC 4
 #define NO_RANGES 8 // multiplo di NO_LEDS_MIC
@@ -234,7 +235,16 @@ void loop(){
 		// quindi
 		// 		x = (255 / 1023) * uscita_microfono
 
-		int status_led = (int) ((255 / (float)1023) * status_mic);
+		// in più, se stiamo parlando, ci interessano valori compresi
+		// tra 0 e la soglia del parlato (definita sopra), e non tra 0 e 1023. Quindi
+		int status_led;
+		if(TALKING){
+			// saturiamo i valori oltre la soglia del parlato
+			if(status_mic > TALKING_THRESHOLD) status_mic = TALKING_THRESHOLD;
+			status_led = (int) ((255 / (float)TALKING_THRESHOLD) * status_mic);
+		}else{
+			status_led = (int) ((255 / (float)1023) * status_mic);
+		}
 
 		//TODO remove
 		Serial.print("(NOISE, MIC, LED, RANGE) --->  ");
