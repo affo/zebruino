@@ -4,18 +4,18 @@
 #define FADE_DURATION 2000
 #define MIC_THRESHOLD 20
 
-#define NO_LEDS_MIC 3
+#define NO_LEDS_MIC 4
 #define NO_RANGES 8
 
 // PIN
 // pin dei sensori di prossimità
-int pin_prox_1 = 2;
-int pin_prox_2 = 7;
+int pin_prox_1 = 8;
+int pin_prox_2 = 9;
 // pin dei led
 int pin_led_1 = 10; // semi-analog
 int pin_led_2 = 11; // semi-analog
-int pin_led_4ever = 6; // semi-analog
-int pin_leds_mic[NO_LEDS_MIC] = {3, 5, 9}; // semi-analog
+int pin_led_4ever = 3; // semi-analog
+int pin_leds_mic[NO_LEDS_MIC] = {4, 5, 6, 7}; // digital
 // pin del microfono
 int pin_mic = A0;
 
@@ -31,7 +31,6 @@ int mic_values[MIC_MEASUREMENT_SPAN], index_mic = 0;
 boolean led_1_on = false;
 boolean led_2_on = false;
 boolean led_4ever_on = false;
-boolean leds_mic_on[NO_LEDS_MIC] = {false, false, false}; 
 
 void add_prox_1(int val){
 	last_prox_1[index_1] = val;
@@ -108,18 +107,12 @@ int rangify(int val){
 void write_led(int range){
 	// accendo quelli che servono
 	for(int i = 0; i < range; i++){
-		if(!leds_mic_on[i]){
-			fade(pin_leds_mic[i], true, 500);
-			leds_mic_on[i] = true;
-		}
+		digitalWrite(pin_leds_mic[i], HIGH);
 	}
 
 	//spengo gli altri
 	for(int i = range; i < NO_LEDS_MIC; i++){
-		if(leds_mic_on[i]){
-			fade(pin_leds_mic[i], false, 500);
-			leds_mic_on[i] = false;
-		}
+		digitalWrite(pin_leds_mic[i], LOW);
 	}
 }
 
@@ -236,12 +229,14 @@ void loop(){
 		int status_led = (int) ((255 / (float)1023) * status_mic);
 
 		//TODO remove
-		Serial.print("(NOISE, MIC, LED) --->  ");
+		Serial.print("(NOISE, MIC, LED, RANGE) --->  ");
 		Serial.print(noise);
 		Serial.print(",\t");
 		Serial.print(status_mic);
 		Serial.print(",\t");
 		Serial.println(status_led);
+		Serial.print(",\t");
+		Serial.println(rangify(status_led));
 
 		// "rangifizzo" il valore del led per evitare il "flickeraggio".
 		// infine scrivo il valore ottenuto sul led
