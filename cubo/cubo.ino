@@ -5,6 +5,8 @@
 int pin_prox_1 = 2;
 int pin_prox_2 = 3;
 // pin dei led
+int pin_led_1 = 12;
+int pin_led_2 = 13;
 int pin_led = 9;
 // pin del microfono
 int pin_mic = A0;
@@ -49,6 +51,8 @@ void setup(){
 	pinMode(pin_prox_1, INPUT);
 	pinMode(pin_prox_2, INPUT);
 	pinMode(pin_led, OUTPUT);
+	pinMode(pin_led_1, OUTPUT);
+	pinMode(pin_led_2, OUTPUT);
 	pinMode(pin_mic, INPUT);
 
 	noise = analogRead(pin_mic);
@@ -59,10 +63,18 @@ void loop(){
 	int status_prox_1 = digitalRead(pin_prox_1);
 	int status_prox_2 = digitalRead(pin_prox_2);
 
-	// TODO rimuovere!
-	// per ora, non abbiamo il secondo sensore di prossimità.
-	// lo settiamo a sempre attivo:
-	status_prox_2 = LOW;
+	// accendo i led in base ai sensori di prossimità
+	if(status_prox_1 == HIGH){
+		digitalWrite(pin_led_1, LOW);
+	}else{
+		digitalWrite(pin_led_1, HIGH);
+	}
+
+	if(status_prox_2 == HIGH){
+		digitalWrite(pin_led_2, LOW);
+	}else{
+		digitalWrite(pin_led_2, HIGH);
+	}
 
 	if(status_prox_1 == HIGH || status_prox_2 == HIGH){
 		// se uno dei sensori non è attivo
