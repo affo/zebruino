@@ -120,7 +120,7 @@ void write_led(int range){
 	}
 
 	//spengo gli altri
-	for(int i = range; i < NO_LEDS_MIC; i += no_range_group){
+	for(int i = range; i < NO_RANGES; i += no_range_group){
 		digitalWrite(pin_leds_mic[i / no_range_group], LOW);
 	}
 }
