@@ -253,7 +253,7 @@ void loop(){
 		}
 
 		//spengo i led del microfono
-		digitalWrite(pin_led_mic, LOW);
+		write_led(0);
 
 		// prendo il rumore
 		noise = analogRead(pin_mic);
