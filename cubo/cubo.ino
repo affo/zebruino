@@ -108,19 +108,19 @@ int rangify(int val){
 // sui 4 led. Più sarà alto il valore letto,
 // più led si accenderanno
 void write_led(int range){
-	int no_led_group = NO_RANGES / NO_LEDS_MIC;
+	int no_range_group = NO_RANGES / NO_LEDS_MIC;
+	while(range % no_range_group != 0){
+		range++;
+	}
+	
 	// accendo quelli che servono
-	for(int i = 0; i < range; i += no_led_group){
-		for(int j = i; j < no_led_group && j < range; j++){
-			digitalWrite(pin_leds_mic[j], HIGH);
-		}
+	for(int i = 0; i < range; i += no_range_group){
+		digitalWrite(pin_leds_mic[i / no_range_group], HIGH);
 	}
 
 	//spengo gli altri
-	for(int i = range; i < NO_LEDS_MIC; i += no_led_group){
-		for(int j = i; j < no_led_group && j < NO_LEDS_MIC; j++){
-			digitalWrite(pin_leds_mic[j], LOW);
-		}
+	for(int i = range; i < NO_LEDS_MIC; i += no_range_group){
+		digitalWrite(pin_leds_mic[i / no_range_group], LOW);
 	}
 }
 
