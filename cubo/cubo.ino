@@ -1,5 +1,5 @@
 #define LOOP_DELAY 10
-#define MEASUREMENT_SPAN 10
+#define MEASUREMENT_SPAN 20
 
 // PIN
 // pin dei sensori di prossimità
@@ -118,15 +118,19 @@ void loop(){
 
 	// accendo i led in base ai sensori di prossimità
 	if(status_prox_1){
-		digitalWrite(pin_led_1, HIGH);
+		//digitalWrite(pin_led_1, HIGH);
+		fade(pin_led_1, true, 2000);
 	}else{
-		digitalWrite(pin_led_1, LOW);
+		//digitalWrite(pin_led_1, LOW);
+		fade(pin_led_1, false, 2000);
 	}
 
 	if(status_prox_2){
-		digitalWrite(pin_led_2, HIGH);
+		//digitalWrite(pin_led_2, HIGH);
+		fade(pin_led_2, true, 2000);
 	}else{
-		digitalWrite(pin_led_2, LOW);
+		//digitalWrite(pin_led_2, LOW);
+		fade(pin_led_2, false, 2000);
 	}
 
 	if(status_prox_1 && status_prox_2){
