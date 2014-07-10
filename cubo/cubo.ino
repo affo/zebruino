@@ -6,9 +6,9 @@
 int pin_prox_1 = 2;
 int pin_prox_2 = 3;
 // pin dei led
-int pin_led_1 = 12;
-int pin_led_2 = 13;
-int pin_led = 9;
+int pin_led_1 = 10; // semi-analog
+int pin_led_2 = 11; // semi-analog
+int pin_led = 9; // semi-analog
 // pin del microfono
 int pin_mic = A0;
 
@@ -70,7 +70,7 @@ int rangify(int led_analog){
 
 // fade
 void fade(int pin, boolean in, int duration){
-	int step = (5 * duration) / 255;
+	int step = (int) ((5 * duration) / (float)255);
 	int min = 0;
 	int max = 255;
 	if(in){
@@ -81,7 +81,7 @@ void fade(int pin, boolean in, int duration){
 		}
 	}else{
 		for(; max >= min; max -= 5){ 
-			analogWrite(pin, min);
+			analogWrite(pin, max);
 			// se non aspetti un po, l'accensione è istantanea (al tuo occhio)    
 			delay(step);
 		}
