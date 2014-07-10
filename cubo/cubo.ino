@@ -9,7 +9,7 @@
 
 // PIN
 // pin dei sensori di prossimità
-int pin_prox_1 = 0
+int pin_prox_1 = 0;
 int pin_prox_2 = 1;
 // pin dei led
 int pin_led_1 = 10; // semi-analog
