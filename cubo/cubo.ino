@@ -31,7 +31,7 @@ int mic_values[MIC_MEASUREMENT_SPAN], index_mic = 0;
 boolean led_1_on = false;
 boolean led_2_on = false;
 boolean led_4ever_on = false;
-boolean leds_mic_on[NO_LEDS_MIC] = {false, false, false, false}; 
+boolean leds_mic_on[NO_LEDS_MIC] = {false, false, false}; 
 
 void add_prox_1(int val){
 	last_prox_1[index_1] = val;
