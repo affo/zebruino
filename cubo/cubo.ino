@@ -147,10 +147,13 @@ void setup(){
 	pinMode(pin_prox_1, INPUT);
 	pinMode(pin_prox_2, INPUT);
 	pinMode(pin_led_4ever, OUTPUT);
-	pinMode(pin_led_mic, OUTPUT);
 	pinMode(pin_led_1, OUTPUT);
 	pinMode(pin_led_2, OUTPUT);
 	pinMode(pin_mic, INPUT);
+
+	for(int i = 0; i < NO_LEDS_MIC; i++){
+		pinMode(pin_leds_mic[i], OUTPUT);
+	}
 
 	noise = analogRead(pin_mic);
 
