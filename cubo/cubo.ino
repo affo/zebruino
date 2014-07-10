@@ -5,7 +5,9 @@
 #define MIC_THRESHOLD 20
 
 #define NO_LEDS_MIC 4
-#define NO_RANGES 8
+#define NO_RANGES 8 // multiplo di NO_LEDS_MIC
+
+#define TALKING true
 
 // PIN
 // pin dei sensori di prossimità
@@ -106,14 +108,19 @@ int rangify(int val){
 // sui 4 led. Più sarà alto il valore letto,
 // più led si accenderanno
 void write_led(int range){
+	int no_led_group = NO_RANGES / NO_LEDS_MIC;
 	// accendo quelli che servono
-	for(int i = 0; i < range; i++){
-		digitalWrite(pin_leds_mic[i], HIGH);
+	for(int i = 0; i < range; i += no_led_group){
+		for(int j = i; j < no_led_group && j < range; j++){
+			digitalWrite(pin_leds_mic[j], HIGH);
+		}
 	}
 
 	//spengo gli altri
-	for(int i = range; i < NO_LEDS_MIC; i++){
-		digitalWrite(pin_leds_mic[i], LOW);
+	for(int i = range; i < NO_LEDS_MIC; i += no_led_group){
+		for(int j = i; j < no_led_group && j < NO_LEDS_MIC; j++){
+			digitalWrite(pin_leds_mic[j], LOW);
+		}
 	}
 }
 
