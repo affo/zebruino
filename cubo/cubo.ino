@@ -44,7 +44,7 @@ void add_prox_2(int val){
 }
 
 void add_mic(int val){
-	last_prox_2[index_2] = val;
+	mic_values[index_2] = val;
 	index_mic++;
 	if(index_mic == MEASUREMENT_SPAN){
 		index_mic = 0;
