@@ -19,6 +19,10 @@ int noise;
 int last_prox_1[MEASUREMENT_SPAN], index_1 = 0;
 int last_prox_2[MEASUREMENT_SPAN], index_2 = 0;
 
+// status dei led di prossimità
+boolean led_1_on = false;
+boolean led_2_on = false;
+
 void add_prox_1(int val){
 	last_prox_1[index_1] = val;
 	index_1 ++;
@@ -118,19 +122,32 @@ void loop(){
 
 	// accendo i led in base ai sensori di prossimità
 	if(status_prox_1){
-		//digitalWrite(pin_led_1, HIGH);
-		fade(pin_led_1, true, 2000);
+		// accendo solo se è spento
+		if(!led_1_on){
+			fade(pin_led_1, true, 2000);
+			led_1_on = true;
+		}
 	}else{
-		//digitalWrite(pin_led_1, LOW);
-		fade(pin_led_1, false, 2000);
+		// spengo solo se è acceso
+		if(led_1_on){
+			fade(pin_led_1, false, 2000);
+			led_1_on = false;
+		}
 	}
 
+	// accendo i led in base ai sensori di prossimità
 	if(status_prox_2){
-		//digitalWrite(pin_led_2, HIGH);
-		fade(pin_led_2, true, 2000);
+		// accendo solo se è spento
+		if(!led_2_on){
+			fade(pin_led_2, true, 2000);
+			led_2_on = true;
+		}
 	}else{
-		//digitalWrite(pin_led_2, LOW);
-		fade(pin_led_2, false, 2000);
+		// spengo solo se è acceso
+		if(led_2_on){
+			fade(pin_led_2, false, 2000);
+			led_2_on = false;
+		}
 	}
 
 	if(status_prox_1 && status_prox_2){
