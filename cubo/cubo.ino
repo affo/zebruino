@@ -69,6 +69,7 @@ int get_prox_2(void){
 // i valori sono equamente distribuiti.
 int rangify(int led_analog){
 	led_analog++;
+	if(led_analog <= 10) return 0;
 	if(led_analog <= 64) return 32;
 	if(led_analog <= 128) return 96;
 	if(led_analog <= 192) return 160;
