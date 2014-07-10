@@ -84,7 +84,7 @@ int get_mic_val(void){
 	for(int i = 0; i < MIC_MEASUREMENT_SPAN; i++){
 		result += mic_values[i];
 	}
-	return (int) (result / (float)PROX_MEASUREMENT_SPAN);
+	return (int) (result / (float)MIC_MEASUREMENT_SPAN);
 }
 
 // funzione creata per non permettere che il led vada in "flickering"
@@ -160,6 +160,9 @@ void setup(){
 	for(int i = 0; i < PROX_MEASUREMENT_SPAN; i++){
 		last_prox_1[i] = HIGH;
 		last_prox_2[i] = HIGH;
+	}
+
+	for(int i = 0; i < MIC_MEASUREMENT_SPAN; i++){
 		mic_values[i] = 0;
 	}
 }
