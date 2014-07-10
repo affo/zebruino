@@ -9,8 +9,8 @@
 
 // PIN
 // pin dei sensori di prossimità
-int pin_prox_1 = 0;
-int pin_prox_2 = 1;
+int pin_prox_1 = 2;
+int pin_prox_2 = 7;
 // pin dei led
 int pin_led_1 = 10; // semi-analog
 int pin_led_2 = 11; // semi-analog
@@ -99,7 +99,7 @@ int rangify(int val){
 		if(val <= step * i) return i;
 	}
 
-	return i;
+	return NO_RANGES;
 }
 
 // funzione che scrive il valore del microfono
