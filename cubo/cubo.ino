@@ -20,6 +20,7 @@ int noise;
 // togliere il flickering dai sensori di prossimità
 int last_prox_1[MEASUREMENT_SPAN], index_1 = 0;
 int last_prox_2[MEASUREMENT_SPAN], index_2 = 0;
+int mic_values[MEASUREMENT_SPAN], index_mic = 0;
 
 // status dei led di prossimità
 boolean led_1_on = false;
@@ -28,7 +29,7 @@ boolean led_4ever_on = false;
 
 void add_prox_1(int val){
 	last_prox_1[index_1] = val;
-	index_1 ++;
+	index_1++;
 	if(index_1 == MEASUREMENT_SPAN){
 		index_1 = 0;
 	}
@@ -36,9 +37,17 @@ void add_prox_1(int val){
 
 void add_prox_2(int val){
 	last_prox_2[index_2] = val;
-	index_2 ++;
+	index_2++;
 	if(index_2 == MEASUREMENT_SPAN){
 		index_2 = 0;
+	}
+}
+
+void add_mic(int val){
+	last_prox_2[index_2] = val;
+	index_mic++;
+	if(index_mic == MEASUREMENT_SPAN){
+		index_mic = 0;
 	}
 }
 
@@ -62,6 +71,14 @@ int get_prox_2(void){
 		}
 	}
 	return result;
+}
+
+int get_mic_val(void){
+	int result = 0;
+	for(int i = 0; i < MEASUREMENT_SPAN; i++){
+		result += mic_values[i];
+	}
+	return (int) (result / (float)MEASUREMENT_SPAN);
 }
 
 // funzione creata per non permettere che il led vada in "flickering"
@@ -112,6 +129,7 @@ void setup(){
 	for(int i = 0; i < MEASUREMENT_SPAN; i++){
 		last_prox_1[i] = HIGH;
 		last_prox_2[i] = HIGH;
+		mic_values[i] = 0;
 	}
 }
 
@@ -169,6 +187,9 @@ void loop(){
 		status_mic -= noise;
 		if(status_mic < 0) status_mic = 0;
 
+		add_mic(status_mic);
+		status_mic = get_mic_val();
+
 		// il microfono è a 10 bit (da 0 a 1023);
 		// il led è a 8 bit (da 0 a 255);
 		// per non fondere il led, normalizzo il valore ottenuto tramite proporzione:
@@ -194,11 +215,14 @@ void loop(){
 		// se uno dei sensori non è attivo
 		// allora vado avanti a "registrare" il rumore di fondo:
 
-		// accendo il led che rimane sempre acceso
+		// spengo il led che rimane sempre acceso
 		if(led_4ever_on){
 			fade(pin_led_4ever, false, FADE_DURATION);
 			led_4ever_on = false;
 		}
+
+		//spengo i led del microfono
+		digitalWrite(pin_led_mic, LOW);
 
 		// prendo il rumore
 		noise = analogRead(pin_mic);
