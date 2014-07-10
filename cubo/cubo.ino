@@ -1,14 +1,15 @@
-#define LOOP_DELAY 10
-#define PROX_MEASUREMENT_SPAN 20
-#define MIC_MEASUREMENT_SPAN 20
-#define FADE_DURATION 2000
-#define MIC_THRESHOLD 25
-#define TALKING_THRESHOLD 125
+#define LOOP_DELAY 10 // frequenza di campionamento di arduino
 
-#define NO_LEDS_MIC 4
+#define PROX_MEASUREMENT_SPAN 20 // numero di valori dei sensori di prossimità su cui si fa la media
+#define MIC_MEASUREMENT_SPAN 20 // numero di valori del microfono su cui si fa la media
+#define FADE_DURATION 2000 // durata del fade dei led
+#define MIC_THRESHOLD 25 // soglia del microfono in aggiunta al rumore di fondo
+#define TALKING_THRESHOLD 125 // soglia del parlato
+
+#define NO_LEDS_MIC 4 // numero di led utilizzati per il microfono
 #define NO_RANGES 8 // multiplo di NO_LEDS_MIC
 
-#define TALKING true
+#define TALKING true // definisce se viene utilizzata la soglia del parlato
 
 // PIN
 // pin dei sensori di prossimità
