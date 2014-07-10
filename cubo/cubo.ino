@@ -94,7 +94,13 @@ int get_mic_val(void){
 // i valori sono equamente distribuiti.
 int rangify(int val){
 	//soglia minima per accendersi
-	int thresh = (int) ((255 / (float)1023) * MIC_THRESHOLD);
+	int thresh;
+	if(TALKING){
+		thresh = (int) ((255 / (float)TALKING_THRESHOLD) * MIC_THRESHOLD);
+	}else{
+		thresh = (int) ((255 / (float)1023) * MIC_THRESHOLD);
+	}
+	
 	if(val < thresh) return 0;
 
 	int step = 256 / NO_RANGES;
