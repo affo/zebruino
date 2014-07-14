@@ -250,7 +250,7 @@ void loop(){
 			if(status_mic > TALKING_THRESHOLD) status_mic = TALKING_THRESHOLD;
 			status_led = (int) ((255 / (float)TALKING_THRESHOLD) * status_mic);
 		}else{
-			status_led = (int) ((255 / (float)1023) * status_mic);
+			status_led = (int) ((255 / (float)(1023 - noise)) * status_mic);
 		}
 
 		//TODO remove
